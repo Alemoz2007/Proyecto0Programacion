@@ -1,15 +1,17 @@
 def main():
-    #Falta el mensaje de bienvenida y la descripción.
+    bienvenida()
+    print()
     print("Por favor escoga alguno de los siguientes números, \
 dependiendo del método de cifrado que desea utilizar")
     continuar = True
     while continuar:
         try:
-             indicación=int(input("Diguite '1' para el método de cifrado césar; '2' para\
+             indicación=(input("Digite '1' para el método de cifrado césar; '2' para\
 el cifrado monoalfabético con palabra clave; '3' para el cifrado vigenère; '4' para el \
 el cifrado PlayFair; '5' para el cifrado Rail Fence; '6' para el cifrado escítala:  "))
-             while indicación not in (1, 2, 3, 4, 5, 6):
-                 indicación = int(input("Digite algún número válido para continuar: ")) #indicación es solo para seleccionar método
+             while indicación not in ["1", "2", "3", "4", "5", "6"]:
+                 print("Indicación invalida") #indicación es solo para seleccionar método
+                 indicación = input("Digite algún número válido para continuar: ")
         #Acá se podría limpiar la pantalla. 
              if indicación == 1:
                  print("Cifrado César")
@@ -31,13 +33,8 @@ el cifrado PlayFair; '5' para el cifrado Rail Fence; '6' para el cifrado escíta
                      print("Decodificar") # Acá iría monoDec(texto, palabra)
              elif indicación == 3:
                  print("Cifrado Vigenère")
-                 selección = int(input("Digite '1' si lo que desea es codificar, de lo contrario, digite '2' para decodificar: "))
-                 while selección not in (1, 2):
-                     selección=int(input("Digite uno de los valores válidos: "))
-                 if selección == 1:
-                     print("Codificar") # Acá iría vigenereCod(texto, palabra)
-                 else:
-                     print("Decodificar") # Acá iría vigenerDec(texto, palabra)
+                 mainVigenere()
+                 print()
              elif indicación == 4:
                  print("Cifrado PlayFair")
                  selección = int(input("Digite '1' si lo que desea es codificar, de lo contrario, digite '2' para decodificar: "))
@@ -68,6 +65,251 @@ el cifrado PlayFair; '5' para el cifrado Rail Fence; '6' para el cifrado escíta
         except Exception as e:
             print(f"Error:{e}")
             continuar = False
+
+def bienvenida():
+    """Programa que se encarga de imprimir un mensaje de bienvenidad para introducir al usuario el programa.
+    Entradas y restricciones:
+    -ninguna
+    Salidas: El mensaje de bienvenida."""
+    print("Bienvenido al programa de codificacion y decodificacion de mensajes.")
+    print("Creado por Luis, Justin, Miranda.")
+    print("En este programa hay varios algoritmos, cada uno con una manera unica de codificar o decodificar, dependiendo de las preferencias del usuario.")
+
+def mainVigenere():
+    """Subrutina principal del algoritmo del Cifrado Vigenère.
+    Entradas y restricciones:
+    -Texto a cifrar
+    -Palabra clave
+    -Opcion
+    Salidas: resultado de la codificacion y descodificacion."""
+    clave = leerClave()
+    opcion = elegirOpcion()
+    texto_clave = preparar(clave)
+    if opcion == "1":
+        mensaje = leerMensaje()
+        texto_mensaje = preparar(mensaje)
+        texto_codificado = vigenereCod(texto_mensaje, texto_clave)
+        print("Texto codificado:", texto_codificado)
+    elif opcion == "2":
+        mensaje2 = leerMensaje2()
+        texto_mensaje2 = preparar(mensaje2)
+        texto_decodificado = vigenereDec(texto_mensaje2, texto_clave)
+        print("Texto decodificado:", texto_decodificado)
+
+def leerClave():
+    """Funcion que lee la palabra clave para codificar o decodificar ingresada por el usuario.
+    Entradas y restricciones:
+    -texto del usuario
+    Salidas: texto ingresado."""
+    clave = input("Primero ingrese la palabra clave para codificar o decodificar su mensaje: ")
+    while not clave.isalpha():
+        print("La palabra clave solo puede contener letras y espacios.")
+        clave = input("Ingrese la palabra clave: ")
+    return clave
+
+def elegirOpcion():
+    print("\n¿Que desea hacer?")
+    print("1. Codificar mensaje")
+    print("2. Decodificar mensaje")
+
+    opcion = input("Seleccione una opcion (1 o 2): ")
+
+    while opcion not in ["1", "2"]:
+        print("Opcion inválida.")
+        opcion = input("Seleccione 1 o 2: ")
+
+    return opcion
+
+def leerMensaje():
+    """Funcion que lee el texto que se va a codificar.
+    Entradas y restricciones:
+    -Mensaje a codificar
+    Salidas: Mensaje ingresado."""
+    mensaje = input("Ingrese el mensaje que quiere codificar. Solo puede contener letra o espacios: ")
+    while not esValido(mensaje):
+        print("El mensaje solo puede contener letras y espacios.")
+        mensaje = input("Ingrese el mensaje: ")
+    return mensaje
+
+def esValido(dato):
+    """Funcion booleana que dice si la palabra clave y mensaje a codificar o decodificar es valido o no.
+    Entradas y restricciones:
+    -Mensaje a analizar (debe ser un string)
+    Salidas: Si el mensaje es valido o invalido."""
+    if type(dato) != str:
+        raise Exception("El mensaje debe ser un string.")
+    if dato == "":
+        return False
+    for letra in dato:
+        if letra.lower() not in " aábcdeéfghiíjklmnñoópqrstuúüvwxyz":
+            return False
+    return True
+    
+def preparar(dato):
+    """Funcion que convierte el texto a minusculas, sustitye acentos y elimina espacios a al inicio y al final.
+    Entradas y restricciones:
+    -texto a procesar (tiene que ser un string)
+    Salidas: texto sin mayúsculas, acentos y espacios."""
+    if type(dato) != str:
+        raise Exception("Texto debe ser un string.")
+    dato = dato.lower()
+    dato = dato.strip()
+    dato = dato.replace("á", "a")
+    dato = dato.replace("é", "e")
+    dato = dato.replace("í", "i")
+    dato = dato.replace("ó", "o")
+    dato = dato.replace("ú", "u")
+    dato = dato.replace("ü", "u")
+    return dato
+
+def vigenereCod(mensaje, clave):    
+
+    letras_a_numeros = {
+
+       'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6,
+
+       'h': 7, 'i': 8, 'j': 9, 'k': 10, 'l': 11, 'm': 12, 'n': 13,
+
+       'ñ': 14, 'o': 15, 'p': 16, 'q': 17, 'r': 18, 's': 19, 't': 20,
+
+       'u': 21, 'v': 22, 'w': 23, 'x': 24, 'y': 25, 'z': 26
+
+    }
+
+
+    numeros_a_letras = {
+
+       0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g',
+
+       7: 'h', 8: 'i', 9: 'j', 10: 'k', 11: 'l', 12: 'm', 13: 'n',
+
+       14: 'ñ', 15: 'o', 16: 'p', 17: 'q', 18: 'r', 19: 's', 20: 't',
+
+       21: 'u', 22: 'v', 23: 'w', 24: 'x', 25: 'y', 26: 'z'
+
+    }
+
+
+    texto_codificado = ""
+
+    posicion_clave = 0 
+
+    for letra in mensaje:
+
+       
+
+
+       if letra in letras_a_numeros:
+
+           
+
+
+           valor_mensaje = letras_a_numeros[letra]
+
+           
+
+
+           letra_clave_actual = clave[posicion_clave]
+
+           valor_clave = letras_a_numeros[letra_clave_actual]
+
+           
+
+
+           suma = valor_mensaje + valor_clave
+
+           
+
+
+           nuevo_valor = suma % 27
+
+           
+
+
+           nueva_letra = numeros_a_letras[nuevo_valor]
+
+           
+
+
+           texto_codificado = texto_codificado + nueva_letra
+
+           
+
+
+           posicion_clave = posicion_clave + 1
+
+           
+
+
+           if posicion_clave == len(clave):
+
+               posicion_clave = 0
+
+               
+
+       else:
+           texto_codificado = texto_codificado + letra
+
+    return texto_codificado
+
+def leerMensaje2():
+    """Funcion que lee el texto que se va a decodificar.
+    Entradas y restricciones:
+    -Mensaje a decodificar
+    Salidas: Mensaje ingresado."""
+    mensaje2 = input("Ingrese el mensaje que quiere decodificar. Solo puede contener letra o espacios: ")
+    while not esValido(mensaje2):
+        print("El mensaje solo puede contener letras y espacios.")
+        mensaje2 = input("Ingrese el mensaje: ")
+    return mensaje2
+
+def vigenereDec(mensaje, clave):
+        letras_a_numeros = {
+           'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6,
+           'h': 7, 'i': 8, 'j': 9, 'k': 10, 'l': 11, 'm': 12, 'n': 13,
+           'ñ': 14, 'o': 15, 'p': 16, 'q': 17, 'r': 18, 's': 19, 't': 20,
+           'u': 21, 'v': 22, 'w': 23, 'x': 24, 'y': 25, 'z': 26
+        }
+
+        numeros_a_letras = {
+           0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g',
+           7: 'h', 8: 'i', 9: 'j', 10: 'k', 11: 'l', 12: 'm', 13: 'n',
+           14: 'ñ', 15: 'o', 16: 'p', 17: 'q', 18: 'r', 19: 's', 20: 't',
+           21: 'u', 22: 'v', 23: 'w', 24: 'x', 25: 'y', 26: 'z'
+        }
+
+        texto_descodificado = ""
+
+        posicion_clave = 0 
+
+        for letra in mensaje:
+
+            if letra in letras_a_numeros:
+
+                valor_mensaje = letras_a_numeros[letra]
+
+                letra_clave_actual = clave[posicion_clave]
+                valor_clave = letras_a_numeros[letra_clave_actual]
+
+                resta = valor_mensaje - valor_clave
+
+                nuevo_valor = resta % 27
+
+                nueva_letra = numeros_a_letras[nuevo_valor]
+
+                texto_descodificado = texto_descodificado + nueva_letra
+
+                posicion_clave = posicion_clave + 1
+
+                if posicion_clave == len(clave):
+                    posicion_clave = 0
+
+            else:
+                texto_descodificado = texto_descodificado + letra
+
+        return texto_descodificado
+
+
 main()
    
     
