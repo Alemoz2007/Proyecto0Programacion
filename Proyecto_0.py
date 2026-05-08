@@ -13,7 +13,7 @@ el cifrado PlayFair; '5' para el cifrado Rail Fence; '6' para el cifrado escíta
              limpiar_pantalla()
              while indicación not in [1,2,3,4,5,6]:
                  print("Indicación invalida") 
-                 indicación = input("Digite algún número válido para continuar: ")
+                 indicación = int(input("Digite algún número válido para continuar: "))
                  limpiar_pantalla()
              if indicación == 1:
                  print("Cifrado César")
