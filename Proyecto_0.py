@@ -7,7 +7,7 @@ dependiendo del método de cifrado que desea utilizar")
     while continuar:
         try:
              print()
-             indicación=int(input("Digite '1' para el método de cifrado césar; '2' para\
+             indicación=int(input("Digite '1' para el método de cifrado césar; '2' para \
 el cifrado monoalfabético con palabra clave; '3' para el cifrado vigenère; '4' para el \
 el cifrado PlayFair; '5' para el cifrado Rail Fence; '6' para el cifrado escítala:  "))
              limpiar_pantalla()
@@ -64,7 +64,8 @@ el cifrado PlayFair; '5' para el cifrado Rail Fence; '6' para el cifrado escíta
                      texto=input("Diguite el texto que desea codificar: ")
                      print (f"Su texto codificado es: {railfenceCod(texto)}")
                  else:
-                     print("Decodificar") # Acá iría railfenceDec(texto)
+                     texto=input("Diguite el texto que desea descodificar: ")
+                     print (f"Su texto descodificado es: {railfenceDec(texto)}")
              else:
                  print("Cifrado Escítala")
                  selección = int(input("Digite '1' si lo que desea es codificar, de lo contrario, digite '2' para decodificar: "))
@@ -389,7 +390,12 @@ def cesarDec(texto, desplazamiento):
             resultado += ALFABETO[nueva_posicion]
 
     return resultado
+
 def railfenceCod(texto):
+    """Función "principal" de la codificación del cifrado rail fence.
+Entradas: un string, la frase a codificar.
+Restricciones: la frase debe ser de tipo string, al igual que la salida.
+Salidas: Un string la frase codificada."""
     mensaje = puntuación(texto)
     if type(mensaje) != list:
         raise Exception("El texto debe ser una lista")
@@ -401,8 +407,14 @@ def railfenceCod(texto):
     línea3 = mensaje[2:len(mensaje):4]
     resultado.append(línea3)
     encriptado = "".join("".join(bloque) for bloque in resultado)
+    espacios = [encriptado[i:i+5] for i in range(0, len(encriptado), 5)]
+    encriptado = " ".join(espacios)
     return encriptado
 def puntuación(texto):
+    """Se encarga de prepara la frase introducida en la función railfenceCod, para facilitar su codificación.
+Entradas: Un string, l    a frase a preparar.
+Restriciones: La entrada debe ser un string, mientras que la salida una lista.
+Salidas: Una lista que contiene la frase original, solo que en este formato, sin símbolos raros ni espacios, intercambia estos por guiones y se asegura que la salida sea multiplo de cuatro."""
     if type(texto) != str or texto == "":
         raise Exception("El texto debe ser de tipo string, y tener algo escrito dentro")
     texto = texto.replace(" ","-")
@@ -415,6 +427,37 @@ def puntuación(texto):
     while len(mensaje)%4 != 0:
         mensaje.append("-")
     return mensaje
+def railfenceDec(texto):
+     """Función "principal" de la descodificación del cifrado rail fence.
+Entradas: un string, la frase a descodificar.
+Restricciones: la frase debe ser de tipo string, al igual que la salida.
+Salidas: Un string la frase descodificada."""
+     texto = texto.replace(" ","")
+     if type(texto) != str or len(texto)%4 != 0:
+         raise Exception("El dato debe ser un string y debe ser múltiplo de 4")
+     mensaje = list(texto)
+     línea1 = mensaje[:len(texto)//4:]
+     línea2 = mensaje[(len(texto)//4):(len(texto)//4) + len(texto)//2:]
+     línea3 = mensaje[(len(texto)//4) + len(texto)//2:(len(texto)//4) + len(texto)//2 + len(texto)//4:]
+     resultado = combinar(línea1, línea2, línea3)
+     desencriptado = "".join("".join(bloque) for bloque in resultado)
+     desencriptado = desencriptado.replace("-"," ")
+     desencriptado = desencriptado.strip()
+     return desencriptado 
+def combinar(línea1, línea2, línea3):
+    """Se encarga de crear una única lista con las líneas del rail fence del railfenceDec, además de acomodarlas para que tengan sentido lógico.
+Entradas: Las tres líneas del railfenceDec, estas deben ser listas y contener letras adentro.
+Restricciones: Tanto las entradas como las salidas deben ser listas.
+Salidas: Una lista con las letras de la frase a descodificar ordenadas."""
+    if type(línea1) != list or type(línea2) != list or type(línea3) != list:
+        raise Exception("Las listas no son listas")
+    resultado = []
+    while línea1 and línea2 and línea3:
+        resultado.append(línea1.pop(0))
+        resultado.append(línea2.pop(0))
+        resultado.append(línea3.pop(0))
+        resultado.append(línea2.pop(0))
+    return resultado
 def limpiar_pantalla():
     """Función que se encarga de imprimir líneas en blanco para 'limpiar' la pantalla
 No tiene entradas ni restricciones, solo imprime 40 líneas en blanco"""
